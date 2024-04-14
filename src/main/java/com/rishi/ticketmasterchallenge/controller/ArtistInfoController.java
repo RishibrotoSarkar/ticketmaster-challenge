@@ -1,6 +1,5 @@
 package com.rishi.ticketmasterchallenge.controller;
 
-import com.rishi.ticketmasterchallenge.dto.Artist;
 import com.rishi.ticketmasterchallenge.service.ArtistInfoService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,7 +15,7 @@ public class ArtistInfoController {
     }
 
     @GetMapping("/artist/{id}")
-    public Mono<Artist> getReactiveArtistInfoById(@PathVariable String id) {
+    public Mono<ArtistInfoDetailResponse> getReactiveArtistInfoById(@PathVariable String id) {
         return Mono.just(artistInfoService.getArtistById(id));
     }
 

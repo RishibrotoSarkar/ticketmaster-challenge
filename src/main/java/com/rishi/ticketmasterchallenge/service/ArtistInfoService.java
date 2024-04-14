@@ -1,7 +1,7 @@
 package com.rishi.ticketmasterchallenge.service;
 
-import com.rishi.ticketmasterchallenge.dto.Artist;
+import com.rishi.ticketmasterchallenge.controller.ArtistInfoDetailResponse;
 
 public interface ArtistInfoService {
-    Artist getArtistById(String id);
+    ArtistInfoDetailResponse getArtistById(String id);
 }
