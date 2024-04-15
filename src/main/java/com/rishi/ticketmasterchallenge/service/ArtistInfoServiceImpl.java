@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static java.util.Objects.isNull;
+
 @Service
 public class ArtistInfoServiceImpl implements ArtistInfoService{
 
@@ -18,17 +20,22 @@ public class ArtistInfoServiceImpl implements ArtistInfoService{
 
     @Override
     public ArtistInfoDetailResponse getArtistById(String id) {
-        List<Event> eventsForArtist = concertInfoClient.getEventsByArtistId(id);
-        updateVenueForTheEvents(eventsForArtist);
-
         return ArtistInfoDetailResponse.builder()
                 .artist(concertInfoClient.getArtistById(id))
-                .events(eventsForArtist)
+                .events(getEventsForTheArtistWithId(id))
                 .build();
     }
 
+    private List<Event> getEventsForTheArtistWithId(String id) {
+        List<Event> eventsForArtist = concertInfoClient.getEventsByArtistId(id);
+        updateVenueForTheEvents(eventsForArtist);
+
+        return eventsForArtist;
+    }
+
     private void updateVenueForTheEvents(List<Event> eventsForArtist) {
-        eventsForArtist.forEach(event -> event.setVenue(
+        if (!isNull(eventsForArtist))
+            eventsForArtist.forEach(event -> event.setVenue(
                 concertInfoClient.getVenueById(event.getVenue().getId())));
     }
 }

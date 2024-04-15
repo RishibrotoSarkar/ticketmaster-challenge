@@ -2,6 +2,8 @@ package com.rishi.ticketmasterchallenge.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.rishi.ticketmasterchallenge.dto.Artist;
+import com.rishi.ticketmasterchallenge.dto.Event;
+import com.rishi.ticketmasterchallenge.dto.Venue;
 import com.rishi.ticketmasterchallenge.exception.DataNotAvailableException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,14 +47,13 @@ class ConcertInfoClientImplTest {
     }
 
     @Test
-    void whenArtistIsPresentInThenListThenGetArtistByIdWillReturnTheArtist() throws JsonProcessingException {
-        String uri = "https://iccp-interview-data.s3-eu-west-1.amazonaws.com/78656681/artists.json";
+    void getArtistByIdShouldReturnTheArtistWhenArtistIsPresentInTheList() throws JsonProcessingException {
         List<Artist> dummyListOfArtists = List.of(
                 Artist.builder().id("1").name("artist1").build(),
                 Artist.builder().id("2").name("artist2").build());
 
 //        when
-        when(client.get().uri(uri).retrieve().body(any(ParameterizedTypeReference.class)))
+        when(client.get().uri(anyString()).retrieve().body(any(ParameterizedTypeReference.class)))
                 .thenReturn(dummyListOfArtists);
 
 //        then
@@ -62,11 +63,10 @@ class ConcertInfoClientImplTest {
     }
 
     @Test
-    void whenWrongUriIsConfiguredThenGetArtistByIdWillThrowHttpClientErrorException() {
-        String uri = "https://iccp-interview-data.s3-eu-west-1.amazonaws.com/78656681/artists.json";
+    void getArtistByIdShouldThrowHttpClientErrorExceptionWhenWrongUriIsConfigured() {
 
         //        when
-        when(client.get().uri(uri).retrieve().body(any(ParameterizedTypeReference.class)))
+        when(client.get().uri(anyString()).retrieve().body(any(ParameterizedTypeReference.class)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.FORBIDDEN));
 
         //  then
@@ -74,11 +74,10 @@ class ConcertInfoClientImplTest {
     }
 
     @Test
-    void whenNoArtistIsPresentForTheIdThenGetArtistByIdWillThrowDataNotAvailableException() {
-        String uri = "https://iccp-interview-data.s3-eu-west-1.amazonaws.com/78656681/artists.json";
+    void getArtistByIdShouldThrowDataNotAvailableExceptionWhenNoArtistIsPresentForTheId() {
 
         //        when
-        when(client.get().uri(uri).retrieve().body(any(ParameterizedTypeReference.class)))
+        when(client.get().uri(anyString()).retrieve().body(any(ParameterizedTypeReference.class)))
                 .thenThrow(new DataNotAvailableException("Artists not available for the id"));
 
         //  then
@@ -86,10 +85,54 @@ class ConcertInfoClientImplTest {
     }
 
     @Test
-    void getVenueById() {
+    void getVenueByIdShouldReturnTheVenueDetailsWhenTheVenueInfoIsPresent() {
+        List<Venue> dummyListOfVenues = List.of(
+                Venue.builder().id("vId1").name("vName1").build(),
+                Venue.builder().id("vId2").name("vName2").build()
+        );
+
+//        when
+        when(client.get().uri(anyString()).retrieve().body(any(ParameterizedTypeReference.class)))
+                .thenReturn(dummyListOfVenues);
+
+//        then
+        Venue result = underTest.getVenueById("vId1");
+        assertThat(result.getId()).isEqualTo("vId1");
+        assertThat(result.getName()).isEqualTo("vName1");
     }
 
     @Test
-    void getEventsByArtistId() {
+    void getEventsByArtistIdShouldReturnTheListOfEventsWhenTheArtistIsPerformingInMultipleEvents() {
+        List<Artist> artistsForEvent1 = List.of(
+                Artist.builder().id("a1").build(),
+                Artist.builder().id("a2").build()
+        );
+
+        List<Artist> artistsForEvent2 = List.of(
+                Artist.builder().id("a2").build(),
+                Artist.builder().id("a3").build()
+        );
+
+        List<Artist> artistsForEvent3 = List.of(
+                Artist.builder().id("a1").build(),
+                Artist.builder().id("a3").build()
+        );
+
+        List<Event> dummyListOfEvents = List.of(
+                Event.builder().id("e1").artists(artistsForEvent1).build(),
+                Event.builder().id("e2").artists(artistsForEvent2).build(),
+                Event.builder().id("e3").artists(artistsForEvent3).build()
+        );
+
+//        when
+        when(client.get().uri(anyString()).retrieve().body(any(ParameterizedTypeReference.class)))
+                .thenReturn(dummyListOfEvents);
+
+//        then
+        List<Event> result = underTest.getEventsByArtistId("a1");
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result.get(0).getId()).isEqualTo("e1");
+        assertThat(result.get(1).getId()).isEqualTo("e3");
+
     }
 }
