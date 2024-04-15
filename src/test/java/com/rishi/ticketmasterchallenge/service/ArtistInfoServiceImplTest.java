@@ -20,7 +20,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ArtistInfoServiceImplTest {
-
     @Mock
     private ConcertInfoClient client;
 
@@ -41,7 +40,7 @@ class ArtistInfoServiceImplTest {
         when(client.getVenueById(any())).thenReturn(createVenueWithIdAndName("vId1", "vName1"));
 
 //        then
-        ArtistInfoDetailResponse result = underTest.getArtistById("id");
+        ArtistInfoDetailResponse result = underTest.getArtistDetailById("id");
         int eventCount = result.getEvents().size();
 
         verify(client, times(1)).getArtistById(any());
@@ -59,7 +58,7 @@ class ArtistInfoServiceImplTest {
         when(client.getVenueById(any())).thenReturn(createVenueWithIdAndName("vId1", "vName1"));
 
 //        then
-        ArtistInfoDetailResponse result = underTest.getArtistById("id");
+        ArtistInfoDetailResponse result = underTest.getArtistDetailById("id");
         assertNotNull(result.getArtist());
         assertThat(result.getArtist().getId()).isEqualTo("id");
         assertThat(result.getArtist().getName()).isEqualTo("artistName");

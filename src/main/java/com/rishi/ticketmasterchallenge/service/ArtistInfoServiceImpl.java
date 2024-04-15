@@ -19,7 +19,7 @@ public class ArtistInfoServiceImpl implements ArtistInfoService{
     }
 
     @Override
-    public ArtistInfoDetailResponse getArtistById(String id) {
+    public ArtistInfoDetailResponse getArtistDetailById(String id) {
         return ArtistInfoDetailResponse.builder()
                 .artist(concertInfoClient.getArtistById(id))
                 .events(getEventsForTheArtistWithId(id))

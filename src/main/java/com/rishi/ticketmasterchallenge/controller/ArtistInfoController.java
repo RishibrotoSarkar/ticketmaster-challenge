@@ -16,7 +16,7 @@ public class ArtistInfoController {
 
     @GetMapping("/artist/{id}")
     public Mono<ArtistInfoDetailResponse> getReactiveArtistInfoById(@PathVariable String id) {
-        return Mono.just(artistInfoService.getArtistById(id));
+        return Mono.just(artistInfoService.getArtistDetailById(id));
     }
 
 }
