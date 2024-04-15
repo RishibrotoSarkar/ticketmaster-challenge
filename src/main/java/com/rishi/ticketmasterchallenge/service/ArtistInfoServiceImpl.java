@@ -35,7 +35,10 @@ public class ArtistInfoServiceImpl implements ArtistInfoService{
 
     private void updateVenueForTheEvents(List<Event> eventsForArtist) {
         if (!isNull(eventsForArtist))
-            eventsForArtist.forEach(event -> event.setVenue(
-                concertInfoClient.getVenueById(event.getVenue().getId())));
+            eventsForArtist.forEach(event -> {
+                event.setArtists(null);
+                event.setVenue(
+                        concertInfoClient.getVenueById(event.getVenue().getId()));
+            });
     }
 }
