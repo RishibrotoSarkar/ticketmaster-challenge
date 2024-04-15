@@ -96,9 +96,10 @@ class ConcertInfoClientImplTest {
                 .thenReturn(dummyListOfVenues);
 
 //        then
-        Venue result = underTest.getVenueById("vId1");
-        assertThat(result.getId()).isEqualTo("vId1");
-        assertThat(result.getName()).isEqualTo("vName1");
+        List<Venue> result = underTest.getVenues();
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result.get(0).getId()).isEqualTo("vId1");
+        assertThat(result.get(1).getName()).isEqualTo("vName2");
     }
 
     @Test

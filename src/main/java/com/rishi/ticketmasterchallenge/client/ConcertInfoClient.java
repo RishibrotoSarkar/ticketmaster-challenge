@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface ConcertInfoClient {
     Artist getArtistById(String id);
-    Venue getVenueById(String id);
+    List<Venue> getVenues();
     List<Event> getEventsByArtistId(String artistId);
 }

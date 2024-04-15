@@ -31,21 +31,20 @@ class ArtistInfoServiceImplTest {
     }
 
     @Test
-    void shouldexecuteTheVenueApuAsManyTimesEventsArePresent() {
+    void shouldexecuteTheVenueOnlyOnceWhenMultipleEventsArePresent() {
         Artist artist = createArtist();
 
 //        when
         when(client.getArtistById(any())).thenReturn(artist);
         when(client.getEventsByArtistId(any())).thenReturn(createEvents());
-        when(client.getVenueById(any())).thenReturn(createVenueWithIdAndName("vId1", "vName1"));
+        when(client.getVenues()).thenReturn(createVenues());
 
 //        then
-        ArtistInfoDetailResponse result = underTest.getArtistDetailById("id");
-        int eventCount = result.getEvents().size();
+        underTest.getArtistDetailById("id");
 
         verify(client, times(1)).getArtistById(any());
         verify(client, times(1)).getEventsByArtistId(any());
-        verify(client, times(eventCount)).getVenueById(any());
+        verify(client, times(1)).getVenues();
     }
 
     @Test
@@ -55,7 +54,7 @@ class ArtistInfoServiceImplTest {
 //        when
         when(client.getArtistById(any())).thenReturn(artist);
         when(client.getEventsByArtistId(any())).thenReturn(createEvents());
-        when(client.getVenueById(any())).thenReturn(createVenueWithIdAndName("vId1", "vName1"));
+        when(client.getVenues()).thenReturn(createVenues());
 
 //        then
         ArtistInfoDetailResponse result = underTest.getArtistDetailById("id");
@@ -75,8 +74,8 @@ class ArtistInfoServiceImplTest {
         assertThat(result.getEvents().get(1).getTitle()).isEqualTo("title2");
 
         assertNotNull(result.getEvents().get(1).getVenue());
-        assertThat(result.getEvents().get(1).getVenue().getId()).isEqualTo("vId1");
-        assertThat(result.getEvents().get(1).getVenue().getName()).isEqualTo("vName1");
+        assertThat(result.getEvents().get(1).getVenue().getId()).isEqualTo("vId2");
+        assertThat(result.getEvents().get(1).getVenue().getName()).isEqualTo("vName2");
 
     }
 
@@ -104,10 +103,10 @@ class ArtistInfoServiceImplTest {
                 .build();
     }
 
-    private Venue createVenueWithIdAndName(String id, String name) {
-        return Venue.builder()
-                .id(id)
-                .name(name)
-                .build();
+    private List<Venue> createVenues() {
+        return List.of(
+                Venue.builder().id("vId1").name("vName1").build(),
+                Venue.builder().id("vId2").name("vName2").build()
+        );
     }
 }

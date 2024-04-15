@@ -3,6 +3,8 @@ package com.rishi.ticketmasterchallenge.service;
 import com.rishi.ticketmasterchallenge.client.ConcertInfoClient;
 import com.rishi.ticketmasterchallenge.controller.ArtistInfoDetailResponse;
 import com.rishi.ticketmasterchallenge.dto.Event;
+import com.rishi.ticketmasterchallenge.dto.Venue;
+import com.rishi.ticketmasterchallenge.exception.DataNotAvailableException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,11 +36,18 @@ public class ArtistInfoServiceImpl implements ArtistInfoService{
     }
 
     private void updateVenueForTheEvents(List<Event> eventsForArtist) {
-        if (!isNull(eventsForArtist))
+        if (!isNull(eventsForArtist)) {
+            final List<Venue> allVenues = concertInfoClient.getVenues();
             eventsForArtist.forEach(event -> {
+                String venueId = event.getVenue().getId();
                 event.setArtists(null);
-                event.setVenue(
-                        concertInfoClient.getVenueById(event.getVenue().getId()));
+                event.setVenue(filterVenueById(allVenues, venueId));
             });
+        }
+    }
+
+    private Venue filterVenueById(List<Venue> venues, String id) {
+        return venues.stream().filter(venue -> venue.getId().equals(id)).findFirst()
+                .orElseThrow(() -> new DataNotAvailableException("No venue is available for the id" + id));
     }
 }

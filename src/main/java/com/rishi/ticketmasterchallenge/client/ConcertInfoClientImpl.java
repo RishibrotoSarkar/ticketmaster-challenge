@@ -27,11 +27,11 @@ public class ConcertInfoClientImpl implements ConcertInfoClient{
     }
 
     @Override
-    public Venue getVenueById(String id) {
-        return filterVenueById(restClient.get()
-                .uri("/venues.json").retrieve()
-                .body(new ParameterizedTypeReference<>() {}),
-                id);
+    public List<Venue> getVenues() {
+        return restClient.get()
+                .uri("/venues.json")
+                .retrieve().body(new ParameterizedTypeReference<>() {
+        });
     }
 
     @Override
@@ -46,11 +46,6 @@ public class ConcertInfoClientImpl implements ConcertInfoClient{
     private Artist filterArtistById(List<Artist> artists, String id) {
         return artists.stream().filter(artist -> artist.getId().equals(id)).findFirst()
                 .orElseThrow(() -> new DataNotAvailableException("Artist not available for the id: " + id));
-    }
-
-    private Venue filterVenueById(List<Venue> venues, String id) {
-        return venues.stream().filter(venue -> venue.getId().equals(id)).findFirst()
-                .orElseThrow(() -> new DataNotAvailableException("No venue is available for the id" + id));
     }
 
     private List<Event> filterEventsByArtistId(List<Event> events, String id) {
