@@ -19,10 +19,16 @@ public class ArtistInfoServiceImpl implements ArtistInfoService{
     @Override
     public ArtistInfoDetailResponse getArtistById(String id) {
         List<Event> eventsForArtist = concertInfoClient.getEventsByArtistId(id);
+        updateVenueForTheEvents(eventsForArtist);
 
         return ArtistInfoDetailResponse.builder()
                 .artist(concertInfoClient.getArtistById(id))
                 .events(eventsForArtist)
                 .build();
+    }
+
+    private void updateVenueForTheEvents(List<Event> eventsForArtist) {
+        eventsForArtist.forEach(event -> event.setVenue(
+                concertInfoClient.getVenueById(event.getVenue().getId())));
     }
 }

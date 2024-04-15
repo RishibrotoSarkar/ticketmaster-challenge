@@ -16,7 +16,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ArtistInfoServiceImplTest {
@@ -32,30 +32,52 @@ class ArtistInfoServiceImplTest {
     }
 
     @Test
+    void shouldexecuteTheVenueApuAsManyTimesEventsArePresent() {
+        Artist artist = createArtist();
+
+//        when
+        when(client.getArtistById(any())).thenReturn(artist);
+        when(client.getEventsByArtistId(any())).thenReturn(createEvents());
+        when(client.getVenueById(any())).thenReturn(createVenueWithIdAndName("vId1", "vName1"));
+
+//        then
+        ArtistInfoDetailResponse result = underTest.getArtistById("id");
+        int eventCount = result.getEvents().size();
+
+        verify(client, times(1)).getArtistById(any());
+        verify(client, times(1)).getEventsByArtistId(any());
+        verify(client, times(eventCount)).getVenueById(any());
+    }
+
+    @Test
     void shouldReturnArtistInfoDetailWhenTheArtistExistForTheGivenId() {
         Artist artist = createArtist();
 
 //        when
         when(client.getArtistById(any())).thenReturn(artist);
         when(client.getEventsByArtistId(any())).thenReturn(createEvents());
+        when(client.getVenueById(any())).thenReturn(createVenueWithIdAndName("vId1", "vName1"));
 
 //        then
         ArtistInfoDetailResponse result = underTest.getArtistById("id");
         assertNotNull(result.getArtist());
         assertThat(result.getArtist().getId()).isEqualTo("id");
         assertThat(result.getArtist().getName()).isEqualTo("artistName");
+
         assertNotNull(result.getEvents());
         assertThat(result.getEvents().size()).isEqualTo(2);
         assertThat(result.getEvents().get(0).getId()).isEqualTo("1");
+
         assertNotNull(result.getEvents().get(0).getVenue());
         assertThat(result.getEvents().get(0).getVenue().getId()).isEqualTo("vId1");
         assertThat(result.getEvents().get(0).getVenue().getName()).isEqualTo("vName1");
 
         assertThat(result.getEvents().get(1).getId()).isEqualTo("2");
         assertThat(result.getEvents().get(1).getTitle()).isEqualTo("title2");
+
         assertNotNull(result.getEvents().get(1).getVenue());
-        assertThat(result.getEvents().get(1).getVenue().getId()).isEqualTo("vId2");
-        assertThat(result.getEvents().get(1).getVenue().getName()).isEqualTo("vName2");
+        assertThat(result.getEvents().get(1).getVenue().getId()).isEqualTo("vId1");
+        assertThat(result.getEvents().get(1).getVenue().getName()).isEqualTo("vName1");
 
     }
 
